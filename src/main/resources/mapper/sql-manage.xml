@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="doit.mapper.ManageMapper">
+
+	<!-- 학생 마이페이지 학생정보 조회 -->
+	<select id="listUser" resultType="doit.dto.UserDto">
+		select user_name, user_phone, user_email
+		from t_user
+		where user_idx = #{userIdx}
+	</select>
+	
+	<!-- 학생 마이페이지 강좌명 조회 -->
+	
+	<select id="listTeacher" resultType="doit.dto.TeacherDto">
+		select lecture_name
+		from t_lecture
+		where lecture_idx = #{lectureIdx}
+	</select>
+	
+	<!-- 학생 마이페이지 출석관리 조회 -->
+	<select id="listAtt" resultType="doit.dto.AttDto">
+	select att_createdAt, att_count, att_price
+	from t_att
+	where user_idx=#{userIdx}
+	</select>
+	
+		
+	<!-- 출석버튼을 눌렀을때, 출석일수와 지원 대상금 증가 -->
+	<insert id="insertAtt" parameterType="doit.dto.AttDto">
+		insert into t_att (user_id, att_date, created_at)
+		values ( #{userId}, #{attDate}, now() )
+		
+	</insert>
+	
+	<update id="updateCount" parameterType="doit.dto.UserDto">
+	UPDATE t_user
+	SET att_count = att_count +1,
+		att_price = att_price +10000
+	WHERE user_idx = #{userIdx}
+	</update>
+	
+	
+	<!-- 출석 기본 정보 조회 -->
+	<select id="selectAttInfo" parameterType="string" resultType="doit.dto.UserLectureDto">
+		select user_name, lecture_name, DATE_FORMAT(now(), '%Y년 %m월 %d일') as today
+		     , (select count(*) from t_att where user_id = #{userId} and date_format(created_at, '%Y%m') = date_format(now(), '%Y%m')) as att_count
+		     , (select count(*) * 10000 from t_att where user_id = #{userId} and date_format(created_at, '%Y%m') = date_format(now(), '%Y%m')) as att_price
+		  from t_user u 
+		  left outer join t_lecture t on u.lecture_idx = t.lecture_idx
+		 where user_id = #{userId}	
+	</select>
+	
+	<select id="selectAttHistory" parameterType="string" resultType="string">
+		select date_format(created_at, '%Y/%m/%d %T') as created_at 
+		  from t_att where user_id = #{userId}
+		   and date_format(created_at, '%Y%m') = date_format(now(), '%Y%m')
+	</select>
+	
+</mapper>

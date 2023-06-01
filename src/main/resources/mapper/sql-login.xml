@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="doit.mapper.LoginMapper">
+	<select id="login" parameterType="doit.dto.LoginDto" resultType="doit.dto.UserDto">
+		select user_id, user_password, user_name, user_email 
+		  from t_user 
+		 where user_id = #{userId} and user_password = #{userPassword}
+	</select>
+	
+	<insert id="registUser" parameterType="doit.dto.UserDto">
+	insert into t_user (user_id, user_password, user_name, user_email, user_phone, user_birth, lecture_idx)
+		values (#{userId}, #{userPassword}, #{userName}, #{userEmail}, #{userPhone}, #{userBirth}, #{lectureIdx})
+	</insert>
+	
+	<select id="selectUserByUserId" parameterType="String" resultType="doit.dto.UserDto">
+		select user_id, user_password, user_name, user_email 
+		  from t_user 
+		 where user_id = #{userId}
+	</select>
+</mapper>
